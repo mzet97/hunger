@@ -1,6 +1,6 @@
 import { Link } from '@chakra-ui/next-js';
 
-export default function Home() {
+export default function Dashboard() {
     return (
         <>
             <div>Home!</div>

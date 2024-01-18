@@ -6,7 +6,11 @@ export default function SwitchTheme() {
 
     return (
         <div>
-            <Button onClick={toggleColorMode}>
+            <Button
+                colorScheme="teal"
+                variant="outline"
+                onClick={toggleColorMode}
+            >
                 {colorMode === 'light' ? (
                     <MoonIcon boxSize={6} />
                 ) : (
