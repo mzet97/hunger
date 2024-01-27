@@ -34,7 +34,7 @@ const Home = () => {
                         <Heading>Or create a new account!</Heading>
                     </Box>
                     <Box>
-                        <Link href="/signup">
+                        <Link href="/signUp">
                             <Text fontSize="4xl">SingUp</Text>
                         </Link>
                     </Box>

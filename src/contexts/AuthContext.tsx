@@ -11,10 +11,36 @@ type SignInCredentials = {
     password: string;
 };
 
+type SignUpCredentials = {
+    email: string;
+    password: string;
+    confirmPassword: string;
+    profile: profileCredentials;
+    address: addressCredentials;
+};
+
+type profileCredentials = {
+    name: string;
+    lastName: string;
+    birthDate: Date;
+    type: number;
+};
+
+type addressCredentials = {
+    street: string;
+    district: string;
+    city: string;
+    county: string;
+    zipCode: string;
+    latitude: string;
+    longitude: string;
+};
+
 type AuthContextData = {
     signIn: (credentials: SignInCredentials) => Promise<void>;
+    signUp: (singUpData: SignUpCredentials) => Promise<void>;
     signOut: () => void;
-    user: Token;
+    user: Token | undefined;
     isAuthenticated: boolean;
 };
 
@@ -83,9 +109,32 @@ export function AuthProvider({ children }: AuthProviderProps) {
         Router.push('/login');
     }
 
+    async function signUp(singUpData: SignUpCredentials) {
+        const response = await api.post('auth/register', singUpData);
+
+        const result: Token = response.data;
+        console.log(result);
+
+        if (result.success) {
+            setCookie(undefined, 'nextauth.token', result.data.accessToken, {
+                maxAge: 60 * 60 * 24 * 30, // 30 days
+                path: '/',
+            });
+
+            setUser(result);
+
+            api.defaults.headers['Authorization'] =
+                `Bearer ${result.data.accessToken}`;
+
+            Router.push('/dashboard');
+        }
+
+        Router.push('/login');
+    }
+
     return (
         <AuthContext.Provider
-            value={{ signIn, signOut, isAuthenticated, user }}
+            value={{ signIn, signUp, signOut, isAuthenticated, user }}
         >
             {children}
         </AuthContext.Provider>

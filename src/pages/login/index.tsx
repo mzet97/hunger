@@ -74,10 +74,6 @@ const Login: React.FC = () => {
         }
     };
 
-    const toSingUo = () => {
-        router.push('/signup');
-    };
-
     return (
         <Flex
             minH={'100vh'}
