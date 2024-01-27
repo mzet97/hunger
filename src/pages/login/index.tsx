@@ -21,23 +21,19 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useRouter } from 'next/navigation';
 import { AuthContext } from '@/contexts/AuthContext';
 import { useContext } from 'react';
+import UserLogin from '@/models/user/UserLogin';
 
 const schema = yup.object().shape({
     email: yup.string().email().required(),
     password: yup.string().min(8).required(),
 });
 
-type LoginFormInputs = {
-    email: string;
-    password: string;
-};
-
 const Login: React.FC = () => {
     const {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<LoginFormInputs>({
+    } = useForm<UserLogin>({
         mode: 'onBlur',
         resolver: yupResolver(schema),
     });
@@ -46,7 +42,7 @@ const Login: React.FC = () => {
     const router = useRouter();
     const { signIn } = useContext(AuthContext);
 
-    const onSubmit = async (values: LoginFormInputs) => {
+    const onSubmit = async (values: UserLogin) => {
         try {
             console.log('input', values);
             await signIn({

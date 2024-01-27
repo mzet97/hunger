@@ -27,6 +27,7 @@ import {
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
+import UserInput from '@/models/user/UserInput';
 
 const schema = yup.object().shape({
     email: yup.string().email().required('E-mail is required'),
@@ -47,22 +48,6 @@ const schema = yup.object().shape({
     longitude: yup.string().max(80).required('Longitude is required'),
 });
 
-type SingUpFormInputs = {
-    email: string;
-    password: string;
-    confirmPassword: string;
-    name: string;
-    lastName: string;
-    birthDate: Date;
-    street: string;
-    district: string;
-    city: string;
-    county: string;
-    zipCode: string;
-    latitude: string;
-    longitude: string;
-};
-
 export default function SignUp() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -71,7 +56,7 @@ export default function SignUp() {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<SingUpFormInputs>({
+    } = useForm<UserInput>({
         mode: 'onBlur',
         resolver: yupResolver(schema),
     });
@@ -80,7 +65,7 @@ export default function SignUp() {
     const router = useRouter();
     const { signUp } = useContext(AuthContext);
 
-    const onSubmit = async (values: SingUpFormInputs) => {
+    const onSubmit = async (values: UserInput) => {
         try {
             console.log('input', values);
             await signUp({

@@ -1,8 +1,8 @@
 import Data from './Data';
 
-interface Token {
+type Token = {
     data: Data;
     success: boolean;
-}
+};
 
 export default Token;

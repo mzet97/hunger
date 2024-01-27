@@ -4,41 +4,12 @@ import Router from 'next/router';
 
 import { api } from '../services/apiClient';
 import Token from '@/models/user/Token';
-import User from '@/models/user/User';
-
-type SignInCredentials = {
-    email: string;
-    password: string;
-};
-
-type SignUpCredentials = {
-    email: string;
-    password: string;
-    confirmPassword: string;
-    profile: profileCredentials;
-    address: addressCredentials;
-};
-
-type profileCredentials = {
-    name: string;
-    lastName: string;
-    birthDate: Date;
-    type: number;
-};
-
-type addressCredentials = {
-    street: string;
-    district: string;
-    city: string;
-    county: string;
-    zipCode: string;
-    latitude: string;
-    longitude: string;
-};
+import UserRegister from '@/models/user/UserRegister';
+import UserLogin from '@/models/user/UserLogin';
 
 type AuthContextData = {
-    signIn: (credentials: SignInCredentials) => Promise<void>;
-    signUp: (singUpData: SignUpCredentials) => Promise<void>;
+    signIn: (credentials: UserLogin) => Promise<void>;
+    signUp: (singUpData: UserRegister) => Promise<void>;
     signOut: () => void;
     user: Token | undefined;
     isAuthenticated: boolean;
@@ -83,7 +54,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const { 'nextauth.token': token } = parseCookies();
     }, []);
 
-    async function signIn({ email, password }: SignInCredentials) {
+    async function signIn({ email, password }: UserLogin) {
         const response = await api.post('auth/login', {
             email,
             password,
@@ -109,8 +80,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         Router.push('/login');
     }
 
-    async function signUp(singUpData: SignUpCredentials) {
-        const response = await api.post('auth/register', singUpData);
+    async function signUp(userDto: UserRegister) {
+        const response = await api.post('auth/register', userDto);
 
         const result: Token = response.data;
         console.log(result);

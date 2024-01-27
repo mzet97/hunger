@@ -1,9 +1,9 @@
 import Claim from './Claim';
 
-interface UserToken {
+type UserToken = {
     email: string;
     id: string;
     claims: Claim[];
-}
+};
 
 export default UserToken;

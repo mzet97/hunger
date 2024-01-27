@@ -1,4 +1,4 @@
-interface Address {
+type Address = {
     id: string;
     street: string;
     district: string;
@@ -7,6 +7,6 @@ interface Address {
     zipCode: string;
     latitude: string;
     longitude: string;
-}
+};
 
 export default Address;

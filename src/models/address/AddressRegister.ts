@@ -1,4 +1,4 @@
-interface AddressRegister {
+type AddressRegister = {
     street: string;
     district: string;
     city: string;
@@ -6,6 +6,6 @@ interface AddressRegister {
     zipCode: string;
     latitude: string;
     longitude: string;
-}
+};
 
 export default AddressRegister;

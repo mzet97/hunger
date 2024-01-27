@@ -1,9 +1,9 @@
 import UserToken from './UserToken';
 
-interface Data {
+type Data = {
     accessToken: string;
     expiresIn: number;
     userToken: UserToken;
-}
+};
 
 export default Data;

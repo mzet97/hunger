@@ -77,7 +77,7 @@ export default function Header() {
                     </Text>
 
                     <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
-                        <DesktopNav />
+                        <DesktopNav user={user} />
                     </Flex>
                 </Flex>
 
@@ -141,20 +141,20 @@ export default function Header() {
             </Flex>
 
             <Collapse in={isOpen} animateOpacity>
-                <MobileNav />
+                <MobileNav user={user} />
             </Collapse>
         </Box>
     );
 }
 
-const DesktopNav = () => {
+const DesktopNav = (user: any) => {
     const linkColor = useColorModeValue('gray.600', 'gray.200');
     const linkHoverColor = useColorModeValue('gray.800', 'white');
     const popoverContentBgColor = useColorModeValue('white', 'gray.800');
 
     return (
         <Stack direction={'row'} spacing={4}>
-            {NAV_ITEMS.map(navItem => (
+            {getNavItems(user).map(navItem => (
                 <Box key={navItem.label}>
                     <Popover trigger={'hover'} placement={'bottom-start'}>
                         <PopoverTrigger>
@@ -246,14 +246,14 @@ const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
     );
 };
 
-const MobileNav = () => {
+const MobileNav = (user: any) => {
     return (
         <Stack
             bg={useColorModeValue('white', 'gray.800')}
             p={4}
             display={{ md: 'none' }}
         >
-            {NAV_ITEMS.map(navItem => (
+            {getNavItems(user).map(navItem => (
                 <MobileNavItem key={navItem.label} {...navItem} />
             ))}
         </Stack>
@@ -329,13 +329,28 @@ interface NavItem {
     href?: string;
 }
 
-const NAV_ITEMS: Array<NavItem> = [
-    {
-        label: 'Home',
-        href: '\\',
-    },
-    {
-        label: 'About',
-        href: 'about',
-    },
-];
+const getNavItems = (user: any): Array<NavItem> => {
+    if (user?.success) {
+        return [
+            {
+                label: 'Dashboard',
+                href: 'dashboard',
+            },
+            {
+                label: 'About',
+                href: 'about',
+            },
+        ];
+    } else {
+        return [
+            {
+                label: 'Home',
+                href: '\\',
+            },
+            {
+                label: 'About',
+                href: 'about',
+            },
+        ];
+    }
+};
