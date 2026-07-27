@@ -9,7 +9,7 @@ import UserLogin from '@/models/user/UserLogin';
 
 type AuthContextData = {
     signIn: (credentials: UserLogin) => Promise<void>;
-    signUp: (singUpData: UserRegister) => Promise<void>;
+    signUp: (signUpData: UserRegister) => Promise<void>;
     signOut: () => void;
     user: Token | undefined;
     isAuthenticated: boolean;
@@ -27,7 +27,9 @@ export function signOut() {
     destroyCookie(undefined, 'nextauth.token');
     destroyCookie(undefined, 'nextauth.refreshToken');
 
-    authChannel.postMessage('signOut');
+    if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
+        authChannel?.postMessage('signOut');
+    }
 
     Router.push('/');
 }
@@ -37,44 +39,55 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const isAuthenticated = !!user;
 
     useEffect(() => {
-        authChannel = new BroadcastChannel('auth');
-
-        authChannel.onmessage = message => {
-            switch (message.data) {
-                case 'signOut':
+        if ('BroadcastChannel' in window) {
+            authChannel = new BroadcastChannel('auth');
+            authChannel.onmessage = message => {
+                if (message.data === 'signOut') {
                     signOut();
-                    break;
-                default:
-                    break;
-            }
-        };
+                }
+            };
+        }
     }, []);
 
     useEffect(() => {
         const { 'nextauth.token': token } = parseCookies();
+        if (token) {
+            api.get('profile')
+                .then(response => {
+                    setUser({
+                        data: {
+                            accessToken: token,
+                            expiresIn: 0,
+                            userToken: {
+                                id: response.data.id || '',
+                                email: response.data.email || '',
+                                claims: [],
+                                profile: response.data,
+                            },
+                        },
+                        success: true,
+                    });
+                })
+                .catch(() => {});
+        }
     }, []);
 
     async function signIn({ email, password }: UserLogin) {
-        const response = await api.post('auth/login', {
-            email,
-            password,
-        });
-
+        const response = await api.post('auth/login', { email, password });
         const result: Token = response.data;
-        console.log(result);
 
         if (result.success) {
             setCookie(undefined, 'nextauth.token', result.data.accessToken, {
-                maxAge: 60 * 60 * 24 * 30, // 30 days
+                maxAge: 60 * 60 * 24 * 30,
                 path: '/',
             });
 
             setUser(result);
-
             api.defaults.headers['Authorization'] =
                 `Bearer ${result.data.accessToken}`;
 
             Router.push('/dashboard');
+            return;
         }
 
         Router.push('/login');
@@ -82,22 +95,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     async function signUp(userDto: UserRegister) {
         const response = await api.post('auth/register', userDto);
-
         const result: Token = response.data;
-        console.log(result);
 
         if (result.success) {
             setCookie(undefined, 'nextauth.token', result.data.accessToken, {
-                maxAge: 60 * 60 * 24 * 30, // 30 days
+                maxAge: 60 * 60 * 24 * 30,
                 path: '/',
             });
 
             setUser(result);
-
             api.defaults.headers['Authorization'] =
                 `Bearer ${result.data.accessToken}`;
 
             Router.push('/dashboard');
+            return;
         }
 
         Router.push('/login');

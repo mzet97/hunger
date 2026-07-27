@@ -19,8 +19,8 @@
     },
     "lint-staged": {
         "*.@(ts|tsx)": [
-            "yarn lint",
-            "yarn format"
+            "npx eslint --fix",
+            "npx prettier --write"
         ]
     },
     "dependencies": {

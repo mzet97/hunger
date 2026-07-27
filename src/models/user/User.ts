@@ -1,4 +1,4 @@
-import { Address } from 'cluster';
+import Address from '../address/Address';
 import Profile from '../profile/Profile';
 
 type User = {

@@ -15,6 +15,8 @@ import {
     useColorModeValue,
     useBreakpointValue,
     useDisclosure,
+    Badge,
+    HStack,
 } from '@chakra-ui/react';
 import {
     HamburgerIcon,
@@ -22,13 +24,16 @@ import {
     ChevronDownIcon,
     ChevronRightIcon,
 } from '@chakra-ui/icons';
+import { FiShoppingCart } from 'react-icons/fi';
 import SwitchTheme from '../SwitchTheme';
 import { AuthContext } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 import { useContext } from 'react';
 
 export default function Header() {
     const { isOpen, onToggle } = useDisclosure();
     const { user, signOut } = useContext(AuthContext);
+    const { itemCount, total } = useCart();
 
     return (
         <Box>
@@ -72,10 +77,11 @@ export default function Header() {
                         })}
                         fontFamily={'heading'}
                         color={useColorModeValue('gray.800', 'white')}
+                        fontWeight="bold"
+                        fontSize="lg"
                     >
-                        Hunger
+                        🍔 Hunger
                     </Text>
-
                     <Flex display={{ base: 'none', md: 'flex' }} ml={10}>
                         <DesktopNav user={user} />
                     </Flex>
@@ -85,19 +91,47 @@ export default function Header() {
                     flex={{ base: 1, md: 0 }}
                     justify={'flex-end'}
                     direction={'row'}
-                    spacing={6}
+                    spacing={4}
+                    align="center"
                 >
                     <SwitchTheme />
                     {user?.success && (
                         <>
                             <Button
-                                as={'a'}
+                                as="a"
+                                href="/cart"
+                                variant="ghost"
+                                position="relative"
+                                leftIcon={<FiShoppingCart />}
+                                size="sm"
+                            >
+                                Cart
+                                {itemCount > 0 && (
+                                    <Badge
+                                        colorScheme="green"
+                                        borderRadius="full"
+                                        position="absolute"
+                                        top="-8px"
+                                        right="-8px"
+                                        fontSize="xs"
+                                    >
+                                        {itemCount}
+                                    </Badge>
+                                )}
+                            </Button>
+                            <Text
+                                fontSize="sm"
+                                color="green.400"
+                                fontWeight="bold"
+                            >
+                                R$ {total.toFixed(2)}
+                            </Text>
+                            <Button
                                 fontSize={'sm'}
                                 fontWeight={400}
-                                colorScheme="whatsapp"
-                                _hover={{
-                                    bg: 'blue.300',
-                                }}
+                                colorScheme="red"
+                                variant="outline"
+                                size="sm"
                                 onClick={() => {
                                     signOut();
                                     window.location.href = '/';
@@ -113,25 +147,20 @@ export default function Header() {
                                 as={'a'}
                                 fontSize={'sm'}
                                 fontWeight={400}
-                                colorScheme="whatsapp"
+                                colorScheme="green"
                                 href={'login'}
-                                _hover={{
-                                    bg: 'blue.300',
-                                }}
+                                size="sm"
                             >
                                 Login
                             </Button>
                             <Button
                                 as={'a'}
-                                display={{ base: 'none', md: 'inline-flex' }}
                                 fontSize={'sm'}
                                 fontWeight={600}
                                 color={'white'}
-                                colorScheme="facebook"
+                                colorScheme="green"
                                 href={'signUp'}
-                                _hover={{
-                                    bg: 'blue.300',
-                                }}
+                                size="sm"
                             >
                                 SignUp
                             </Button>
@@ -150,174 +179,49 @@ export default function Header() {
 const DesktopNav = (user: any) => {
     const linkColor = useColorModeValue('gray.600', 'gray.200');
     const linkHoverColor = useColorModeValue('gray.800', 'white');
-    const popoverContentBgColor = useColorModeValue('white', 'gray.800');
 
     return (
         <Stack direction={'row'} spacing={4}>
             {getNavItems(user).map(navItem => (
                 <Box key={navItem.label}>
-                    <Popover trigger={'hover'} placement={'bottom-start'}>
-                        <PopoverTrigger>
-                            <Box
-                                as="a"
-                                p={2}
-                                href={navItem.href ?? '#'}
-                                fontSize={'sm'}
-                                fontWeight={500}
-                                color={linkColor}
-                                _hover={{
-                                    textDecoration: 'none',
-                                    color: linkHoverColor,
-                                }}
-                            >
-                                {navItem.label}
-                            </Box>
-                        </PopoverTrigger>
-
-                        {navItem.children && (
-                            <PopoverContent
-                                border={0}
-                                boxShadow={'xl'}
-                                bg={popoverContentBgColor}
-                                p={4}
-                                rounded={'xl'}
-                                minW={'sm'}
-                            >
-                                <Stack>
-                                    {navItem.children.map(child => (
-                                        <DesktopSubNav
-                                            key={child.label}
-                                            {...child}
-                                        />
-                                    ))}
-                                </Stack>
-                            </PopoverContent>
-                        )}
-                    </Popover>
+                    <Box
+                        as="a"
+                        p={2}
+                        href={navItem.href ?? '#'}
+                        fontSize={'sm'}
+                        fontWeight={500}
+                        color={linkColor}
+                        _hover={{
+                            textDecoration: 'none',
+                            color: linkHoverColor,
+                        }}
+                    >
+                        {navItem.label}
+                    </Box>
                 </Box>
             ))}
         </Stack>
-    );
-};
-
-const DesktopSubNav = ({ label, href, subLabel }: NavItem) => {
-    return (
-        <Box
-            as="a"
-            href={href}
-            role={'group'}
-            display={'block'}
-            p={2}
-            rounded={'md'}
-            _hover={{ bg: useColorModeValue('pink.50', 'gray.900') }}
-        >
-            <Stack direction={'row'} align={'center'}>
-                <Box>
-                    <Text
-                        transition={'all .3s ease'}
-                        _groupHover={{ color: 'pink.400' }}
-                        fontWeight={500}
-                    >
-                        {label}
-                    </Text>
-                    <Text fontSize={'sm'}>{subLabel}</Text>
-                </Box>
-                <Flex
-                    transition={'all .3s ease'}
-                    transform={'translateX(-10px)'}
-                    opacity={0}
-                    _groupHover={{
-                        opacity: '100%',
-                        transform: 'translateX(0)',
-                    }}
-                    justify={'flex-end'}
-                    align={'center'}
-                    flex={1}
-                >
-                    <Icon
-                        color={'pink.400'}
-                        w={5}
-                        h={5}
-                        as={ChevronRightIcon}
-                    />
-                </Flex>
-            </Stack>
-        </Box>
     );
 };
 
 const MobileNav = (user: any) => {
+    const navBg = useColorModeValue('white', 'gray.800');
+    const navColor = useColorModeValue('gray.600', 'gray.200');
+
     return (
-        <Stack
-            bg={useColorModeValue('white', 'gray.800')}
-            p={4}
-            display={{ md: 'none' }}
-        >
+        <Stack bg={navBg} p={4} display={{ md: 'none' }}>
             {getNavItems(user).map(navItem => (
-                <MobileNavItem key={navItem.label} {...navItem} />
+                <Box
+                    key={navItem.label}
+                    py={2}
+                    as="a"
+                    href={navItem.href ?? '#'}
+                >
+                    <Text fontWeight={600} color={navColor}>
+                        {navItem.label}
+                    </Text>
+                </Box>
             ))}
-        </Stack>
-    );
-};
-
-const MobileNavItem = ({ label, children, href }: NavItem) => {
-    const { isOpen, onToggle } = useDisclosure();
-
-    return (
-        <Stack spacing={4} onClick={children && onToggle}>
-            <Box
-                py={2}
-                as="a"
-                href={href ?? '#'}
-                justifyContent="space-between"
-                alignItems="center"
-                _hover={{
-                    textDecoration: 'none',
-                }}
-            >
-                <Text
-                    fontWeight={600}
-                    color={useColorModeValue('gray.600', 'gray.200')}
-                >
-                    {label}
-                </Text>
-                {children && (
-                    <Icon
-                        as={ChevronDownIcon}
-                        transition={'all .25s ease-in-out'}
-                        transform={isOpen ? 'rotate(180deg)' : ''}
-                        w={6}
-                        h={6}
-                    />
-                )}
-            </Box>
-
-            <Collapse
-                in={isOpen}
-                animateOpacity
-                style={{ marginTop: '0!important' }}
-            >
-                <Stack
-                    mt={2}
-                    pl={4}
-                    borderLeft={1}
-                    borderStyle={'solid'}
-                    borderColor={useColorModeValue('gray.200', 'gray.700')}
-                    align={'start'}
-                >
-                    {children &&
-                        children.map(child => (
-                            <Box
-                                as="a"
-                                key={child.label}
-                                py={2}
-                                href={child.href}
-                            >
-                                {child.label}
-                            </Box>
-                        ))}
-                </Stack>
-            </Collapse>
         </Stack>
     );
 };
@@ -332,25 +236,10 @@ interface NavItem {
 const getNavItems = (user: any): Array<NavItem> => {
     if (user?.success) {
         return [
-            {
-                label: 'Dashboard',
-                href: 'dashboard',
-            },
-            {
-                label: 'About',
-                href: 'about',
-            },
-        ];
-    } else {
-        return [
-            {
-                label: 'Home',
-                href: '\\',
-            },
-            {
-                label: 'About',
-                href: 'about',
-            },
+            { label: 'Dashboard', href: '/dashboard' },
+            { label: 'Orders', href: '/orders' },
+            { label: 'Profile', href: '/profile' },
         ];
     }
+    return [{ label: 'Home', href: '/' }];
 };

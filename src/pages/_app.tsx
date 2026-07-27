@@ -5,17 +5,20 @@ import Header from '@/components/Header';
 
 import theme from './theme';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { CartProvider } from '@/contexts/CartContext';
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
     return (
         <AuthProvider>
-            <Providers>
-                <ColorModeScript
-                    initialColorMode={theme.config.initialColorMode}
-                />
-                <Header />
-                <Component {...pageProps} />
-            </Providers>
+            <CartProvider>
+                <Providers>
+                    <ColorModeScript
+                        initialColorMode={theme.config.initialColorMode}
+                    />
+                    <Header />
+                    <Component {...pageProps} />
+                </Providers>
+            </CartProvider>
         </AuthProvider>
     );
 };
